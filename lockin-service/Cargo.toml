@@ -1,0 +1,21 @@
+[package]
+name = "lockin-service"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "lockin-service"
+path = "src/main.rs"
+
+[dependencies]
+lockin-core = { path = "../lockin-core" }
+tokio = { version = "1.0", features = ["full"] }
+windows = { version = "0.51", features = ["Win32_System_Services", "Win32_System_ProcessStatus", "Win32_Foundation"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+log = "0.4"
+tracing = "0.1"
+tracing-subscriber = "0.3"

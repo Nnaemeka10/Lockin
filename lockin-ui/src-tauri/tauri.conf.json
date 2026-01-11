@@ -1,0 +1,22 @@
+{
+  "build": {
+    "beforeBuildCommand": "",
+    "beforeDevCommand": "",
+    "devPath": "",
+    "frontendDist": ""
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Lockin",
+        "width": 600,
+        "height": 400,
+        "resizable": false,
+        "fullscreen": false
+      }
+    ]
+  },
+  "security": {
+    "csp": null
+  }
+}
