@@ -18,5 +18,8 @@ pub mod error;
 pub use domain::{LockDuration, LockRule, LockState};
 pub use error::LockError;
 
+// Public API: time types
+pub use time::{TimeAnchor, TimeValidator};
+
 // Re-export chrono types for convenience (time domain is public API)
 pub use chrono::{DateTime, Duration, Utc};

@@ -60,6 +60,29 @@ pub enum LockError {
     ValidationFailed {
         message: String,
     },
+
+    /// Wall-clock time has moved backward (rollback detected).
+    TimeRollbackDetected {
+        previous_time: String,
+        current_time: String,
+        rollback_amount_ms: i64,
+    },
+
+    /// Monotonic time is inconsistent (should never happen on same device).
+    MonotonicTimeInconsistent {
+        expected_at_least_ms: u128,
+        observed_ms: u128,
+    },
+
+    /// Time anchor is invalid or corrupted.
+    InvalidTimeAnchor {
+        reason: String,
+    },
+
+    /// Attempt to validate time without any anchors (no reference point).
+    NoTimeAnchor {
+        reason: String,
+    },
 }
 
 impl fmt::Display for LockError {
@@ -113,6 +136,33 @@ impl fmt::Display for LockError {
             }
             LockError::ValidationFailed { message } => {
                 write!(f, "Validation failed: {}", message)
+            }
+            LockError::TimeRollbackDetected {
+                previous_time,
+                current_time,
+                rollback_amount_ms,
+            } => {
+                write!(
+                    f,
+                    "Time rollback detected: was {} now {}, rollback {} ms",
+                    previous_time, current_time, rollback_amount_ms
+                )
+            }
+            LockError::MonotonicTimeInconsistent {
+                expected_at_least_ms,
+                observed_ms,
+            } => {
+                write!(
+                    f,
+                    "Monotonic time inconsistent: expected at least {}ms, observed {}ms",
+                    expected_at_least_ms, observed_ms
+                )
+            }
+            LockError::InvalidTimeAnchor { reason } => {
+                write!(f, "Invalid time anchor: {}", reason)
+            }
+            LockError::NoTimeAnchor { reason } => {
+                write!(f, "No time anchor: {}", reason)
             }
         }
     }
