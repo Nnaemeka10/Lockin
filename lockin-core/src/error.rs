@@ -83,6 +83,47 @@ pub enum LockError {
     NoTimeAnchor {
         reason: String,
     },
+
+    /// Persistence layer: encryption key is invalid or too short.
+    InvalidEncryptionKey {
+        reason: String,
+    },
+
+    /// Persistence layer: failed to encrypt lock state.
+    EncryptionFailed {
+        reason: String,
+    },
+
+    /// Persistence layer: failed to decrypt lock state.
+    DecryptionFailed {
+        reason: String,
+    },
+
+    /// Persistence layer: integrity check failed (file was tampered with).
+    IntegrityCheckFailed {
+        expected_hmac: String,
+        computed_hmac: String,
+    },
+
+    /// Persistence layer: serialization failed.
+    SerializationFailed {
+        reason: String,
+    },
+
+    /// Persistence layer: deserialization failed.
+    DeserializationFailed {
+        reason: String,
+    },
+
+    /// Persistence layer: loaded state is inconsistent or corrupted.
+    LoadedStateInvalid {
+        reason: String,
+    },
+
+    /// Persistence layer: file I/O error.
+    FileIoError {
+        reason: String,
+    },
 }
 
 impl fmt::Display for LockError {
@@ -163,6 +204,37 @@ impl fmt::Display for LockError {
             }
             LockError::NoTimeAnchor { reason } => {
                 write!(f, "No time anchor: {}", reason)
+            }
+            LockError::InvalidEncryptionKey { reason } => {
+                write!(f, "Invalid encryption key: {}", reason)
+            }
+            LockError::EncryptionFailed { reason } => {
+                write!(f, "Encryption failed: {}", reason)
+            }
+            LockError::DecryptionFailed { reason } => {
+                write!(f, "Decryption failed: {}", reason)
+            }
+            LockError::IntegrityCheckFailed {
+                expected_hmac,
+                computed_hmac,
+            } => {
+                write!(
+                    f,
+                    "Integrity check failed: expected {} but computed {}",
+                    expected_hmac, computed_hmac
+                )
+            }
+            LockError::SerializationFailed { reason } => {
+                write!(f, "Serialization failed: {}", reason)
+            }
+            LockError::DeserializationFailed { reason } => {
+                write!(f, "Deserialization failed: {}", reason)
+            }
+            LockError::LoadedStateInvalid { reason } => {
+                write!(f, "Loaded state invalid: {}", reason)
+            }
+            LockError::FileIoError { reason } => {
+                write!(f, "File I/O error: {}", reason)
             }
         }
     }

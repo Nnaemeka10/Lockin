@@ -21,5 +21,8 @@ pub use error::LockError;
 // Public API: time types
 pub use time::{TimeAnchor, TimeValidator};
 
+// Public API: persistence types
+pub use persistence::{EncryptedLockStore, EncryptedSnapshot, LockStateSnapshot};
+
 // Re-export chrono types for convenience (time domain is public API)
 pub use chrono::{DateTime, Duration, Utc};
