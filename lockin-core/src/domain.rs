@@ -63,9 +63,7 @@ impl LockDuration {
             });
         }
 
-        Ok(LockDuration(
-            Duration::days(days).expect("Duration construction should not fail"),
-        ))
+        Ok(LockDuration(Duration::days(days)))
     }
 
     /// Get the underlying `chrono::Duration`.
