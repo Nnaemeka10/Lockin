@@ -124,6 +124,35 @@ pub enum LockError {
     FileIoError {
         reason: String,
     },
+
+    /// Process detection: failed to enumerate running processes.
+    ProcessEnumerationFailed {
+        reason: String,
+    },
+
+    /// Process detection: could not read process information.
+    ProcessQueryFailed {
+        pid: u32,
+        reason: String,
+    },
+
+    /// Process detection: path normalization failed.
+    PathNormalizationFailed {
+        path: String,
+        reason: String,
+    },
+
+    /// Process detection: could not get executable path for process.
+    ExecutablePathNotFound {
+        pid: u32,
+        reason: String,
+    },
+
+    /// Process detection: no matching processes found for app.
+    NoMatchingProcesses {
+        app_name: String,
+        searched_count: usize,
+    },
 }
 
 impl fmt::Display for LockError {
@@ -235,6 +264,28 @@ impl fmt::Display for LockError {
             }
             LockError::FileIoError { reason } => {
                 write!(f, "File I/O error: {}", reason)
+            }
+            LockError::ProcessEnumerationFailed { reason } => {
+                write!(f, "Process enumeration failed: {}", reason)
+            }
+            LockError::ProcessQueryFailed { pid, reason } => {
+                write!(f, "Failed to query process {}: {}", pid, reason)
+            }
+            LockError::PathNormalizationFailed { path, reason } => {
+                write!(f, "Failed to normalize path '{}': {}", path, reason)
+            }
+            LockError::ExecutablePathNotFound { pid, reason } => {
+                write!(f, "Could not get executable path for process {}: {}", pid, reason)
+            }
+            LockError::NoMatchingProcesses {
+                app_name,
+                searched_count,
+            } => {
+                write!(
+                    f,
+                    "No processes matching '{}' found (searched {} processes)",
+                    app_name, searched_count
+                )
             }
         }
     }

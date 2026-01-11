@@ -24,5 +24,8 @@ pub use time::{TimeAnchor, TimeValidator};
 // Public API: persistence types
 pub use persistence::{EncryptedLockStore, EncryptedSnapshot, LockStateSnapshot};
 
+// Public API: process types
+pub use process::{ProcessInfo, ProcessMatcher, ProcessQuery};
+
 // Re-export chrono types for convenience (time domain is public API)
 pub use chrono::{DateTime, Duration, Utc};
