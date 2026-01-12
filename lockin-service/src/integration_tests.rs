@@ -43,20 +43,44 @@ mod tests {
 
     #[test]
     fn service_manager_register_mock() {
-        // Phase 6.1: Mock implementation - just logs
+        // Phase 7: Attempts real Windows API but accepts admin-required failures
         let manager = ServiceManager::new().expect("Failed to create ServiceManager");
         let result = manager.register();
         
-        assert!(result.is_ok(), "register() should succeed in mock mode");
+        // Either succeeds or fails with admin-required error (both valid in test environment)
+        // In actual deployment, this requires admin privileges
+        match result {
+            Ok(()) => {
+                // Success - service was created (unlikely in test environment)
+            }
+            Err(e) => {
+                // Expected error - no admin privileges or service already exists
+                let msg = format!("{:?}", e);
+                assert!(msg.contains("admin") || msg.contains("already exist"), 
+                    "Error should be admin-related or service conflict: {}", msg);
+            }
+        }
     }
 
     #[test]
     fn service_manager_unregister_mock() {
-        // Phase 6.1: Mock implementation - just logs
+        // Phase 7: Attempts real Windows API but accepts admin-required failures
         let manager = ServiceManager::new().expect("Failed to create ServiceManager");
         let result = manager.unregister();
         
-        assert!(result.is_ok(), "unregister() should succeed in mock mode");
+        // Either succeeds or fails with admin-required error (both valid in test environment)
+        // In actual deployment, this requires admin privileges
+        match result {
+            Ok(()) => {
+                // Success - service was deleted (unlikely in test environment)
+            }
+            Err(e) => {
+                // Expected error - no admin privileges or service not found
+                let msg = format!("{:?}", e);
+                assert!(msg.contains("admin") || msg.contains("not found") || msg.contains("Unable"),
+                    "Error should be admin-related or service not found: {}", msg);
+            }
+        }
     }
 
     #[test]

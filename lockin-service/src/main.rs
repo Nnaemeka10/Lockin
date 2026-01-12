@@ -45,7 +45,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // Phase 6.1: Will start EnforcementLoop::run() to monitor and enforce
 
             // Set up service control handler (to receive stop signal)
-            ServiceManager::setup_control_handler()?;
+            let manager = ServiceManager::new()?;
+            manager.setup_control_handler()?;
 
             println!("(Phase 6.1: Service enforcement loop will be initialized here)");
 
