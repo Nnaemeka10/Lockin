@@ -9,5 +9,8 @@ pub mod ipc;
 pub mod process_killer;
 pub mod service;
 
+#[cfg(test)]
+mod integration_tests;
+
 pub use error::{ServiceError, ServiceResult};
 pub use service::{ServiceManager, WindowsServiceConfig};

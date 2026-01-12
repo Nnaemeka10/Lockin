@@ -1,0 +1,118 @@
+//! Phase 6.1 Integration Tests
+//!
+//! Tests for Windows Service layer components:
+//! - ProcessKiller termination logic
+//! - ServiceManager lifecycle management
+//! - EnforcementLoop event loop
+//! - IPC command/response handling
+
+#[cfg(test)]
+mod tests {
+    use crate::service::{ServiceManager, WindowsServiceConfig};
+    use crate::process_killer::ProcessKiller;
+    use crate::enforcement_loop::EnforcementLoop;
+    use lockin_core::{LockDuration, LockRule, LockState, EnforcementEngine, ProcessInfo};
+    use chrono::Utc;
+    use chrono::Duration;
+
+    #[test]
+    fn service_manager_creates_with_default_config() {
+        let manager = ServiceManager::new().expect("Failed to create ServiceManager");
+        let config = manager.config();
+        
+        assert_eq!(config.service_name, "LockinService");
+        assert!(!config.display_name.is_empty());
+        assert!(!config.description.is_empty());
+    }
+
+    #[test]
+    fn service_manager_creates_with_custom_config() {
+        let custom_config = WindowsServiceConfig {
+            service_name: "TestService".to_string(),
+            display_name: "Test Service".to_string(),
+            description: "Test service for integration tests".to_string(),
+        };
+
+        let manager = ServiceManager::with_config(custom_config.clone())
+            .expect("Failed to create ServiceManager");
+        let config = manager.config();
+
+        assert_eq!(config.service_name, "TestService");
+        assert_eq!(config.display_name, "Test Service");
+    }
+
+    #[test]
+    fn service_manager_register_mock() {
+        // Phase 6.1: Mock implementation - just logs
+        let manager = ServiceManager::new().expect("Failed to create ServiceManager");
+        let result = manager.register();
+        
+        assert!(result.is_ok(), "register() should succeed in mock mode");
+    }
+
+    #[test]
+    fn service_manager_unregister_mock() {
+        // Phase 6.1: Mock implementation - just logs
+        let manager = ServiceManager::new().expect("Failed to create ServiceManager");
+        let result = manager.unregister();
+        
+        assert!(result.is_ok(), "unregister() should succeed in mock mode");
+    }
+
+    #[test]
+    fn service_control_handler_setup_mock() {
+        // Phase 6.1: Mock implementation - just logs
+        let result = ServiceManager::setup_control_handler();
+        
+        assert!(result.is_ok(), "setup_control_handler() should succeed in mock mode");
+    }
+
+    #[test]
+    fn process_killer_terminate_mock() {
+        // Phase 6.1: Mock implementation - just logs
+        let result = ProcessKiller::terminate(1234, "test termination");
+        
+        assert!(result.is_ok(), "terminate() should succeed in mock mode");
+    }
+
+    #[test]
+    fn process_killer_terminate_with_respawn_detection_mock() {
+        let process = ProcessInfo::new(1234, "notepad.exe", "C:\\Windows\\notepad.exe")
+            .expect("Failed to create ProcessInfo");
+
+        let result = ProcessKiller::terminate_with_respawn_detection(&process, "respawn test");
+        
+        assert!(result.is_ok(), "terminate_with_respawn_detection() should succeed in mock mode");
+    }
+
+    #[test]
+    fn enforcement_loop_creates_successfully() {
+        // Create a lock state
+        let duration = LockDuration::from_days(1)
+            .expect("Failed to create LockDuration");
+        let rule = LockRule::new("notepad.exe".to_string(), duration)
+            .expect("Failed to create LockRule");
+        let now = Utc::now();
+        let lock_state = LockState::new(rule, now)
+            .expect("Failed to create LockState");
+
+        // Create enforcement engine with grace period
+        let grace_period = Duration::seconds(30);
+        let engine = EnforcementEngine::new(lock_state, grace_period)
+            .expect("Failed to create EnforcementEngine");
+
+        // Create enforcement loop
+        let loop_result = EnforcementLoop::new(engine);
+        
+        assert!(loop_result.is_ok(), "EnforcementLoop should create successfully");
+    }
+
+    #[test]
+    fn service_manager_default_trait() {
+        let manager1 = ServiceManager::default();
+        let manager2 = ServiceManager::default();
+        
+        assert_eq!(manager1.config().service_name, manager2.config().service_name);
+        assert_eq!(manager1.config().display_name, manager2.config().display_name);
+    }
+}

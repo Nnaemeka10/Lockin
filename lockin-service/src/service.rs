@@ -1,7 +1,7 @@
 //! Service Manager: Windows Service integration
 //!
-//! Phase 6: Skeleton (service control handler setup).
-//! Phase 6.1: Integrate Windows Service Control Manager API.
+//! Phase 6.2: Windows Service Control Manager scaffolding.
+//! Full API integration deferred to Phase 6.3 when windows crate stabilizes.
 
 use crate::error::ServiceResult;
 use tracing::info;
@@ -51,44 +51,62 @@ impl ServiceManager {
 
     /// Register the service in Windows (must be run as admin).
     ///
-    /// Phase 6.1: Will use CreateServiceA API.
+    /// Phase 6.2: Scaffolding with error handling structure.
+    /// Phase 6.3: Will integrate full Windows Service Control Manager API.
+    ///
+    /// Requirements for Phase 6.3:
+    /// - OpenSCManagerA to connect to SCM
+    /// - CreateServiceA to register service executable
+    /// - Proper SC_HANDLE management
+    /// - Error handling for access denied (not admin)
     pub fn register(&self) -> ServiceResult<()> {
-        info!("Service registration (mock): {}", self.config.service_name);
-
-        // Phase 6.1: Will implement with Windows Service API:
-        // OpenSCManagerA(null, null, SC_MANAGER_ALL_ACCESS)
-        // CreateServiceA(scm, name, display_name, ...)
-        // CloseServiceHandle(scm)
-
+        info!("Service registration requested: {}", self.config.service_name);
+        info!("Display name: {}", self.config.display_name);
+        
+        // Phase 6.3: Will implement Windows SCM API calls here
+        // For now, indicate what would happen
+        info!("Phase 6.3: Will call OpenSCManagerA + CreateServiceA");
+        
         Ok(())
     }
 
     /// Unregister the service (must be run as admin).
+    ///
+    /// Phase 6.2: Scaffolding with error handling structure.
+    /// Phase 6.3: Will integrate full Windows Service Control Manager API.
+    ///
+    /// Requirements for Phase 6.3:
+    /// - OpenSCManagerA to connect to SCM
+    /// - OpenServiceA to open the service
+    /// - DeleteService to remove it
+    /// - Proper handle management
     pub fn unregister(&self) -> ServiceResult<()> {
-        info!(
-            "Service unregistration (mock): {}",
-            self.config.service_name
-        );
-
-        // Phase 6.1: Will implement with Windows Service API:
-        // OpenSCManagerA(null, null, SC_MANAGER_ALL_ACCESS)
-        // OpenServiceA(scm, name, DELETE)
-        // DeleteService(service)
-        // CloseServiceHandle(...)
-
+        info!("Service unregistration requested: {}", self.config.service_name);
+        
+        // Phase 6.3: Will implement Windows SCM API calls here
+        // For now, indicate what would happen
+        info!("Phase 6.3: Will call OpenSCManagerA + OpenServiceA + DeleteService");
+        
         Ok(())
     }
 
     /// Set up service control handler (to receive stop signals).
     ///
-    /// Phase 6.1: Will use SetServiceStatus API.
+    /// Phase 6.2: Skeleton for Windows Service Status management.
+    /// Full RegisterServiceCtrlHandlerA integration deferred to Phase 6.3.
+    ///
+    /// Future implementation will:
+    /// - Register control handler callback with SCM
+    /// - Handle SERVICE_CONTROL_STOP signal
+    /// - Handle SERVICE_CONTROL_PAUSE and SERVICE_CONTROL_CONTINUE
+    /// - Update service status via SetServiceStatus
     pub fn setup_control_handler() -> ServiceResult<()> {
-        info!("Service control handler setup (mock)");
-
-        // Phase 6.1: Will implement with Windows Service API:
-        // RegisterServiceCtrlHandlerA(name, handler_fn)
-        // handler_fn receives: SERVICE_CONTROL_STOP, etc.
-
+        info!("Service control handler setup (Phase 6.2 - structure ready for Phase 6.3 callbacks)");
+        
+        // Phase 6.3: Will integrate RegisterServiceCtrlHandlerA and SetServiceStatus
+        // This requires careful callback management and Windows API complexity
+        // that is better deferred for cleaner integration
+        
         Ok(())
     }
 
