@@ -12,6 +12,7 @@ pub mod domain;
 pub mod time;
 pub mod persistence;
 pub mod process;
+pub mod enforcement;
 pub mod error;
 
 // Public API: domain types
@@ -26,6 +27,9 @@ pub use persistence::{EncryptedLockStore, EncryptedSnapshot, LockStateSnapshot};
 
 // Public API: process types
 pub use process::{ProcessInfo, ProcessMatcher, ProcessQuery};
+
+// Public API: enforcement types
+pub use enforcement::{EnforcementAction, EnforcementEngine, GracePeriod, ProcessTerminationLog, RespawnDetector};
 
 // Re-export chrono types for convenience (time domain is public API)
 pub use chrono::{DateTime, Duration, Utc};

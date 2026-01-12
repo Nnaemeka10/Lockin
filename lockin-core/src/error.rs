@@ -153,6 +153,26 @@ pub enum LockError {
         app_name: String,
         searched_count: usize,
     },
+
+    /// Enforcement: grace period configuration is invalid.
+    InvalidGracePeriod {
+        reason: String,
+    },
+
+    /// Enforcement: attempted to terminate process that is not currently tracked.
+    ProcessNotTracked {
+        pid: u32,
+    },
+
+    /// Enforcement: respawn detection logic failed.
+    RespawnDetectionFailed {
+        reason: String,
+    },
+
+    /// Enforcement: cannot apply enforcement (lock not active, etc).
+    EnforcementNotApplicable {
+        reason: String,
+    },
 }
 
 impl fmt::Display for LockError {
@@ -286,6 +306,18 @@ impl fmt::Display for LockError {
                     "No processes matching '{}' found (searched {} processes)",
                     app_name, searched_count
                 )
+            }
+            LockError::InvalidGracePeriod { reason } => {
+                write!(f, "Invalid grace period: {}", reason)
+            }
+            LockError::ProcessNotTracked { pid } => {
+                write!(f, "Process {} is not currently tracked", pid)
+            }
+            LockError::RespawnDetectionFailed { reason } => {
+                write!(f, "Respawn detection failed: {}", reason)
+            }
+            LockError::EnforcementNotApplicable { reason } => {
+                write!(f, "Enforcement not applicable: {}", reason)
             }
         }
     }

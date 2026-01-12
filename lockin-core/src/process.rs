@@ -229,7 +229,7 @@ impl ProcessQuery {
         #[cfg(not(test))]
         {
             Err(LockError::ProcessQueryFailed {
-                pid,
+                pid: _pid,
                 reason: "Process query not yet implemented (Phase 5)".to_string(),
             })
         }
