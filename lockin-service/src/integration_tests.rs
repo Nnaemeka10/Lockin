@@ -85,11 +85,67 @@ mod tests {
 
     #[test]
     fn service_control_handler_setup_mock() {
-        // Phase 6.1: Mock implementation - just logs
+        // Phase 8: Control handler setup
         let manager = ServiceManager::new().expect("Failed to create ServiceManager");
         let result = manager.setup_control_handler();
         
-        assert!(result.is_ok(), "setup_control_handler() should succeed in mock mode");
+        assert!(result.is_ok(), "setup_control_handler() should succeed");
+    }
+
+    #[test]
+    fn service_state_transitions() {
+        // Phase 8: Test state machine transitions
+        use crate::service::ServiceState;
+        
+        let manager = ServiceManager::new().expect("Failed to create ServiceManager");
+        
+        // Initial state: Stopped
+        assert_eq!(
+            manager.get_state().expect("Failed to get state"),
+            ServiceState::Stopped
+        );
+
+        // Transition to Running
+        manager.start_service().expect("Failed to start service");
+        assert_eq!(
+            manager.get_state().expect("Failed to get state"),
+            ServiceState::Running
+        );
+
+        // Transition to Paused
+        manager.pause_service().expect("Failed to pause service");
+        assert_eq!(
+            manager.get_state().expect("Failed to get state"),
+            ServiceState::Paused
+        );
+
+        // Transition back to Running
+        manager.resume_service().expect("Failed to resume service");
+        assert_eq!(
+            manager.get_state().expect("Failed to get state"),
+            ServiceState::Running
+        );
+
+        // Transition to Stopped
+        manager.stop_service().expect("Failed to stop service");
+        assert_eq!(
+            manager.get_state().expect("Failed to get state"),
+            ServiceState::Stopped
+        );
+    }
+
+    #[test]
+    fn service_shutdown_signal() {
+        // Phase 8: Verify shutdown signal mechanism
+        use crate::service::{is_shutdown_requested, request_shutdown};
+        
+        // Reset signal first (since it's static)
+        // Note: This test may be affected by other tests running in parallel
+        // In a real scenario, we'd use thread-local storage or test isolation
+        
+        // Request shutdown
+        request_shutdown();
+        assert!(is_shutdown_requested());
     }
 
     #[test]

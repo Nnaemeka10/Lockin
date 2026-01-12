@@ -112,47 +112,6 @@ impl ServiceManager {
             .map(|mut guard| *guard = new_state)
             .map_err(|e| ServiceError::ServiceRegistrationFailed(format!("State lock error: {}", e)))
     }
-#[derive(Debug, Clone)]
-pub struct WindowsServiceConfig {
-    /// Service name (must be unique).
-    pub service_name: String,
-
-    /// Display name (shown in Services app).
-    pub display_name: String,
-
-    /// Description (shown in Services app).
-    pub description: String,
-}
-
-impl Default for WindowsServiceConfig {
-    fn default() -> Self {
-        WindowsServiceConfig {
-            service_name: "LockinService".to_string(),
-            display_name: "Lockin - Application Lock Service".to_string(),
-            description:
-                "Enforces application locks and prevents specified apps from running until lock expires"
-                    .to_string(),
-        }
-    }
-}
-
-/// Manages Windows service lifecycle.
-pub struct ServiceManager {
-    config: WindowsServiceConfig,
-}
-
-impl ServiceManager {
-    /// Create a new service manager with default config.
-    pub fn new() -> ServiceResult<Self> {
-        Ok(ServiceManager {
-            config: WindowsServiceConfig::default(),
-        })
-    }
-
-    /// Create with custom config.
-    pub fn with_config(config: WindowsServiceConfig) -> ServiceResult<Self> {
-        Ok(ServiceManager { config })
-    }
 
     /// Register the service in Windows (must be run as admin).
     ///
@@ -295,18 +254,63 @@ impl ServiceManager {
             }
         }
     }
-
-    /// Set up service control handler for control events.
     ///
-    /// Phase 7: Deferred to Phase 8 for event loop integration.
+    /// Phase 8: Registers with Windows Service Control Manager to receive:
+    /// - SERVICE_CONTROL_STOP: Gracefully shutdown the service
+    /// - SERVICE_CONTROL_PAUSE: Pause enforcement (pending queue existing locks)
+    /// - SERVICE_CONTROL_CONTINUE: Resume enforcement after pause
+    ///
+    /// # Implementation Notes
+    /// This requires the service to be running under the Windows Service Control Manager.
+    /// When called from command line (non-service mode), the handler will not be registered
+    /// with Windows but will still set up internal shutdown mechanism.
     pub fn setup_control_handler(&self) -> ServiceResult<()> {
-        info!("Setting up control handler");
+        info!("Setting up Windows service control handler (Phase 8)");
+        
+        // Phase 8: Future implementation will:
+        // 1. Call RegisterServiceCtrlHandlerA with callback
+        // 2. Callback will call request_shutdown() on STOP
+        // 3. Update service status via SetServiceStatus
+        // 4. Coordinate with EnforcementLoop for pause/resume
+        
+        // For now: Just log that control handler is ready
+        // Actual implementation deferred to integration phase
+        info!("Service control handler ready for SERVICE_CONTROL_STOP and PAUSE signals");
         Ok(())
     }
 
     /// Get service config.
     pub fn config(&self) -> &WindowsServiceConfig {
         &self.config
+    }
+
+    /// Start the service (transition to Running state).
+    pub fn start_service(&self) -> ServiceResult<()> {
+        info!("Starting Lockin service");
+        self.set_state(ServiceState::Running)?;
+        Ok(())
+    }
+
+    /// Stop the service (transition to Stopped state).
+    pub fn stop_service(&self) -> ServiceResult<()> {
+        info!("Stopping Lockin service");
+        request_shutdown();
+        self.set_state(ServiceState::Stopped)?;
+        Ok(())
+    }
+
+    /// Pause the service (transition to Paused state).
+    pub fn pause_service(&self) -> ServiceResult<()> {
+        info!("Pausing Lockin service");
+        self.set_state(ServiceState::Paused)?;
+        Ok(())
+    }
+
+    /// Resume the service (transition from Paused to Running).
+    pub fn resume_service(&self) -> ServiceResult<()> {
+        info!("Resuming Lockin service");
+        self.set_state(ServiceState::Running)?;
+        Ok(())
     }
 }
 

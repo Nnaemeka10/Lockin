@@ -13,4 +13,4 @@ pub mod service;
 mod integration_tests;
 
 pub use error::{ServiceError, ServiceResult};
-pub use service::{ServiceManager, WindowsServiceConfig};
+pub use service::{ServiceManager, WindowsServiceConfig, ServiceState, is_shutdown_requested, request_shutdown};
