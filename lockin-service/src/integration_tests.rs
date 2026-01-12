@@ -62,7 +62,8 @@ mod tests {
     #[test]
     fn service_control_handler_setup_mock() {
         // Phase 6.1: Mock implementation - just logs
-        let result = ServiceManager::setup_control_handler();
+        let manager = ServiceManager::new().expect("Failed to create ServiceManager");
+        let result = manager.setup_control_handler();
         
         assert!(result.is_ok(), "setup_control_handler() should succeed in mock mode");
     }
